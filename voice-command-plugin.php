@@ -7,6 +7,11 @@
  * License: GPLv2 or later
  * Text Domain: voice-command-plugin
  */
+/**
+ * GitHub Plugin URI: https://github.com/yourusername/your-plugin-repo
+ * GitHub Branch: main
+ */
+
 
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
