@@ -5,26 +5,31 @@ if (!defined('ABSPATH')) {
 
 use Elementor\Widget_Base;
 use Elementor\Controls_Manager;
-use Elementor\Group_Control_Typography;
+use Elementor\Icons_Manager;
 
 class Voice_Command_Widget extends \Elementor\Widget_Base {
 
+    // Widget name
     public function get_name() {
         return 'voice_command_widget';
     }
 
+    // Widget title
     public function get_title() {
         return __('Voice Command Button', 'voice-command-plugin');
     }
 
+    // Widget icon
     public function get_icon() {
         return 'eicon-microphone';
     }
 
+    // Widget category
     public function get_categories() {
         return ['general'];
     }
 
+    // Widget controls
     protected function _register_controls() {
         $this->start_controls_section(
             'content_section',
@@ -44,25 +49,14 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
         );
 
         $this->add_control(
-            'button_style',
-            [
-                'label' => __('Button Style', 'voice-command-plugin'),
-                'type' => Controls_Manager::SELECT,
-                'options' => [
-                    'flat' => __('Flat', 'voice-command-plugin'),
-                    'outlined' => __('Outlined', 'voice-command-plugin'),
-                    '3d' => __('3D', 'voice-command-plugin'),
-                ],
-                'default' => 'flat',
-            ]
-        );
-
-        $this->add_control(
             'button_color',
             [
-                'label' => __('Button Color', 'voice-command-plugin'),
+                'label' => __('Button Background Color', 'voice-command-plugin'),
                 'type' => Controls_Manager::COLOR,
                 'default' => '#0073aa',
+                'selectors' => [
+                    '{{WRAPPER}} #voice-command-btn' => 'background-color: {{VALUE}};',
+                ],
             ]
         );
 
@@ -72,6 +66,9 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
                 'label' => __('Text Color', 'voice-command-plugin'),
                 'type' => Controls_Manager::COLOR,
                 'default' => '#ffffff',
+                'selectors' => [
+                    '{{WRAPPER}} #voice-command-btn' => 'color: {{VALUE}};',
+                ],
             ]
         );
 
@@ -90,7 +87,7 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
         );
 
         $this->add_group_control(
-            Group_Control_Typography::get_type(),
+            \Elementor\Group_Control_Typography::get_type(),
             [
                 'name' => 'button_typography',
                 'label' => __('Typography', 'voice-command-plugin'),
@@ -125,6 +122,31 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
         );
 
         $this->add_control(
+            'button_icon',
+            [
+                'label' => __('Icon', 'voice-command-plugin'),
+                'type' => Controls_Manager::ICONS,
+                'default' => [
+                    'value' => 'fas fa-microphone',
+                    'library' => 'solid',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'icon_position',
+            [
+                'label' => __('Icon Position', 'voice-command-plugin'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'before' => __('Before Text', 'voice-command-plugin'),
+                    'after' => __('After Text', 'voice-command-plugin'),
+                ],
+                'default' => 'before',
+            ]
+        );
+
+        $this->add_control(
             'custom_css',
             [
                 'label' => __('Custom CSS', 'voice-command-plugin'),
@@ -136,43 +158,38 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
         $this->end_controls_section();
     }
 
+    // Render widget output
     protected function render() {
         $settings = $this->get_settings_for_display();
 
-        // Define styles based on the selected button style
-        $style = '';
-        switch ($settings['button_style']) {
-            case 'outlined':
-                $style = 'background-color: transparent; border: 2px solid ' . esc_attr($settings['button_color']) . ';';
-                break;
-            case '3d':
-                $style = 'box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);';
-                break;
-            case 'flat':
-            default:
-                $style = 'background-color: ' . esc_attr($settings['button_color']) . ';';
-                break;
+        $icon_html = '';
+        if (!empty($settings['button_icon']['value'])) {
+            $icon_html = Icons_Manager::render_icon($settings['button_icon'], ['aria-hidden' => 'true']);
         }
 
         $size_class = $settings['button_size'];
+        $custom_css = !empty($settings['custom_css']) ? '<style>' . $settings['custom_css'] . '</style>' : '';
 
+        echo $custom_css;
         ?>
         <div style="text-align: <?php echo esc_attr($settings['alignment']); ?>;">
             <button id="voice-command-btn" class="<?php echo esc_attr($size_class); ?>" style="
-                <?php echo $style; ?>
+                background-color: <?php echo esc_attr($settings['button_color']); ?>;
                 color: <?php echo esc_attr($settings['text_color']); ?>;
                 padding: <?php echo ($size_class === 'large' ? '15px 20px' : ($size_class === 'small' ? '5px 10px' : '10px 15px')); ?>;
-                border-radius: 5px;
                 border: none;
+                border-radius: 5px;
                 cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 5px;
             ">
-                <?php echo esc_html($settings['button_text']); ?>
+                <?php if ($settings['icon_position'] === 'before') echo $icon_html; ?>
+                <span><?php echo esc_html($settings['button_text']); ?></span>
+                <?php if ($settings['icon_position'] === 'after') echo $icon_html; ?>
             </button>
         </div>
         <?php
-
-        if (!empty($settings['custom_css'])) {
-            echo '<style>' . $settings['custom_css'] . '</style>';
-        }
     }
 }
