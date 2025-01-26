@@ -5,36 +5,32 @@ if (!defined('ABSPATH')) {
 
 use Elementor\Widget_Base;
 use Elementor\Controls_Manager;
+use Elementor\Group_Control_Typography;
 
 class Voice_Command_Widget extends \Elementor\Widget_Base {
 
-    // Widget name
     public function get_name() {
         return 'voice_command_widget';
     }
 
-    // Widget title
     public function get_title() {
         return __('Voice Command Button', 'voice-command-plugin');
     }
 
-    // Widget icon
     public function get_icon() {
         return 'eicon-microphone';
     }
 
-    // Widget category
     public function get_categories() {
         return ['general'];
     }
 
-    // Widget controls
     protected function _register_controls() {
         $this->start_controls_section(
             'content_section',
             [
                 'label' => __('Content', 'voice-command-plugin'),
-                'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
+                'tab' => Controls_Manager::TAB_CONTENT,
             ]
         );
 
@@ -42,8 +38,22 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
             'button_text',
             [
                 'label' => __('Button Text', 'voice-command-plugin'),
-                'type' => \Elementor\Controls_Manager::TEXT,
+                'type' => Controls_Manager::TEXT,
                 'default' => __('Start Voice Command', 'voice-command-plugin'),
+            ]
+        );
+
+        $this->add_control(
+            'button_style',
+            [
+                'label' => __('Button Style', 'voice-command-plugin'),
+                'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'flat' => __('Flat', 'voice-command-plugin'),
+                    'outlined' => __('Outlined', 'voice-command-plugin'),
+                    '3d' => __('3D', 'voice-command-plugin'),
+                ],
+                'default' => 'flat',
             ]
         );
 
@@ -51,7 +61,7 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
             'button_color',
             [
                 'label' => __('Button Color', 'voice-command-plugin'),
-                'type' => \Elementor\Controls_Manager::COLOR,
+                'type' => Controls_Manager::COLOR,
                 'default' => '#0073aa',
             ]
         );
@@ -60,7 +70,7 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
             'text_color',
             [
                 'label' => __('Text Color', 'voice-command-plugin'),
-                'type' => \Elementor\Controls_Manager::COLOR,
+                'type' => Controls_Manager::COLOR,
                 'default' => '#ffffff',
             ]
         );
@@ -69,7 +79,7 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
             'button_size',
             [
                 'label' => __('Button Size', 'voice-command-plugin'),
-                'type' => \Elementor\Controls_Manager::SELECT,
+                'type' => Controls_Manager::SELECT,
                 'options' => [
                     'small' => __('Small', 'voice-command-plugin'),
                     'medium' => __('Medium', 'voice-command-plugin'),
@@ -80,7 +90,7 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
         );
 
         $this->add_group_control(
-            \Elementor\Group_Control_Typography::get_type(),
+            Group_Control_Typography::get_type(),
             [
                 'name' => 'button_typography',
                 'label' => __('Typography', 'voice-command-plugin'),
@@ -92,7 +102,7 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
             'alignment',
             [
                 'label' => __('Alignment', 'voice-command-plugin'),
-                'type' => \Elementor\Controls_Manager::CHOOSE,
+                'type' => Controls_Manager::CHOOSE,
                 'options' => [
                     'left' => [
                         'title' => __('Left', 'voice-command-plugin'),
@@ -115,34 +125,10 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
         );
 
         $this->add_control(
-            'button_icon',
-            [
-                'label' => __('Icon', 'voice-command-plugin'),
-                'type' => \Elementor\Controls_Manager::ICONS,
-            ]
-        );
-
-        $this->add_control(
-            'icon_position',
-            [
-                'label' => __('Icon Position', 'voice-command-plugin'),
-                'type' => \Elementor\Controls_Manager::SELECT,
-                'options' => [
-                    'before' => __('Before Text', 'voice-command-plugin'),
-                    'after' => __('After Text', 'voice-command-plugin'),
-                ],
-                'default' => 'before',
-                'condition' => [
-                    'button_icon!' => '',
-                ],
-            ]
-        );
-
-        $this->add_control(
             'custom_css',
             [
                 'label' => __('Custom CSS', 'voice-command-plugin'),
-                'type' => \Elementor\Controls_Manager::TEXTAREA,
+                'type' => Controls_Manager::TEXTAREA,
                 'description' => __('Add custom CSS styles for this button.', 'voice-command-plugin'),
             ]
         );
@@ -150,40 +136,40 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
         $this->end_controls_section();
     }
 
-    // Render widget output
     protected function render() {
         $settings = $this->get_settings_for_display();
 
-        $icon_html = '';
-        if (!empty($settings['button_icon'])) {
-            $icon_html = \Elementor\Icons_Manager::render_icon($settings['button_icon'], ['aria-hidden' => 'true']);
+        // Define styles based on the selected button style
+        $style = '';
+        switch ($settings['button_style']) {
+            case 'outlined':
+                $style = 'background-color: transparent; border: 2px solid ' . esc_attr($settings['button_color']) . ';';
+                break;
+            case '3d':
+                $style = 'box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);';
+                break;
+            case 'flat':
+            default:
+                $style = 'background-color: ' . esc_attr($settings['button_color']) . ';';
+                break;
         }
 
-        $size_class = esc_attr($settings['button_size']);
-        $button_style = sprintf(
-            'background-color: %s; color: %s; padding: %s; border: none; border-radius: 5px; cursor: pointer;',
-            esc_attr($settings['button_color']),
-            esc_attr($settings['text_color']),
-            $size_class === 'large' ? '15px 20px' : ($size_class === 'small' ? '5px 10px' : '10px 15px')
-        );
+        $size_class = $settings['button_size'];
 
-        echo '<div id="voice-command-widget" style="text-align: ' . esc_attr($settings['alignment']) . '">';
-
-        echo '<button id="voice-command-btn" class="' . esc_attr($size_class) . '" style="' . $button_style . '">';
-
-        if ($settings['icon_position'] === 'before' && $icon_html) {
-            echo $icon_html;
-        }
-
-        echo esc_html($settings['button_text']);
-
-        if ($settings['icon_position'] === 'after' && $icon_html) {
-            echo $icon_html;
-        }
-
-        echo '</button>';
-
-        echo '</div>';
+        ?>
+        <div style="text-align: <?php echo esc_attr($settings['alignment']); ?>;">
+            <button id="voice-command-btn" class="<?php echo esc_attr($size_class); ?>" style="
+                <?php echo $style; ?>
+                color: <?php echo esc_attr($settings['text_color']); ?>;
+                padding: <?php echo ($size_class === 'large' ? '15px 20px' : ($size_class === 'small' ? '5px 10px' : '10px 15px')); ?>;
+                border-radius: 5px;
+                border: none;
+                cursor: pointer;
+            ">
+                <?php echo esc_html($settings['button_text']); ?>
+            </button>
+        </div>
+        <?php
 
         if (!empty($settings['custom_css'])) {
             echo '<style>' . $settings['custom_css'] . '</style>';
