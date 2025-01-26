@@ -1,13 +1,13 @@
 <?php
 /*
 Plugin Name: Voice Command Plugin
-Plugin URI: https://github.com/yourusername/voice-command-plugin
+Plugin URI: https://github.com/rafiqcoder/Voice-Command-Navigation.git
 Description: Add a voice command button widget for Elementor.
 Version: 1.2.1
 Author: Your Name
 Author URI: https://yourwebsite.com
 License: GPL2
-GitHub Plugin URI: https://github.com/yourusername/voice-command-plugin
+GitHub Plugin URI: https://github.com/rafiqcoder/Voice-Command-Navigation.git
 GitHub Branch: main
 */
 
