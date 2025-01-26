@@ -116,10 +116,10 @@ function vcp_render_admin_page() {
     <?php
 }
 
-function vcp_add_voice_command_button() {
-    echo '<button id="voice-command-btn" style="position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 10px 15px; background-color: #0073aa; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Start Voice Command</button>';
-}
-add_action('wp_footer', 'vcp_add_voice_command_button');
+// function vcp_add_voice_command_button() {
+//     echo '<button id="voice-command-btn" style="position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 10px 15px; background-color: #0073aa; color: #fff; border: none; border-radius: 5px; cursor: pointer;">Start Voice Command</button>';
+// }
+// add_action('wp_footer', 'vcp_add_voice_command_button');
 
 
 function vcp_enqueue_scripts() {
