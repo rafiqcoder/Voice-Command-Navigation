@@ -163,7 +163,7 @@ function vcp_check_for_github_updates($transient) {
     }
 
     $plugin_slug = 'voice-command-plugin';
-    $github_api_url = 'https://api.github.com/repos/yourusername/voice-command-plugin/releases/latest';
+    $github_api_url = 'https://github.com/rafiqcoder/Voice-Command-Navigation/releases/latest';
 
     $response = wp_remote_get($github_api_url);
 
