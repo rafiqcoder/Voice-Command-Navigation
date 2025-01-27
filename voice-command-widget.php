@@ -158,38 +158,43 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
         $this->end_controls_section();
     }
 
-    // Render widget output
-    protected function render() {
-        $settings = $this->get_settings_for_display();
+protected function render() {
+    $settings = $this->get_settings_for_display();
 
-        $icon_html = '';
-        if (!empty($settings['button_icon']['value'])) {
-            $icon_html = Icons_Manager::render_icon($settings['button_icon'], ['aria-hidden' => 'true']);
-        }
-
-        $size_class = $settings['button_size'];
-        $custom_css = !empty($settings['custom_css']) ? '<style>' . $settings['custom_css'] . '</style>' : '';
-
-        echo $custom_css;
-        ?>
-        <div style="text-align: <?php echo esc_attr($settings['alignment']); ?>;">
-            <button id="voice-command-btn" class="<?php echo esc_attr($size_class); ?>" style="
-                background-color: <?php echo esc_attr($settings['button_color']); ?>;
-                color: <?php echo esc_attr($settings['text_color']); ?>;
-                padding: <?php echo ($size_class === 'large' ? '15px 20px' : ($size_class === 'small' ? '5px 10px' : '10px 15px')); ?>;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                gap: 5px;
-            ">
-                <?php if ($settings['icon_position'] === 'before') echo $icon_html; ?>
-                <span><?php echo esc_html($settings['button_text']); ?></span>
-                <?php if ($settings['icon_position'] === 'after') echo $icon_html; ?>
-            </button>
-        </div>
-        <?php
+    // Render the icon HTML
+    $icon_html = '';
+    if (!empty($settings['button_icon']['value'])) {
+        $icon_html = \Elementor\Icons_Manager::render_icon($settings['button_icon'], ['aria-hidden' => 'true']);
     }
+
+    // Determine the button size class
+    $size_class = $settings['button_size'];
+
+    // Add custom CSS if provided
+    if (!empty($settings['custom_css'])) {
+        echo '<style>' . $settings['custom_css'] . '</style>';
+    }
+
+    ?>
+    <div style="text-align: <?php echo esc_attr($settings['alignment']); ?>;">
+        <button id="voice-command-btn" class="<?php echo esc_attr($size_class); ?>" style="
+            background-color: <?php echo esc_attr($settings['button_color']); ?>;
+            color: <?php echo esc_attr($settings['text_color']); ?>;
+            padding: <?php echo ($size_class === 'large' ? '15px 20px' : ($size_class === 'small' ? '5px 10px' : '10px 15px')); ?>;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        " >
+            <?php if ($settings['icon_position'] === 'before') echo $icon_html; ?>
+            <span><?php echo esc_html($settings['button_text']); ?></span>
+            <?php if ($settings['icon_position'] === 'after') echo $icon_html; ?>
+        </button>
+    </div>
+    
+    <?php
 }
+

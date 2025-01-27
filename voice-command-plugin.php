@@ -3,7 +3,7 @@
 Plugin Name: Voice Command Plugin
 Plugin URI: https://github.com/rafiqcoder/Voice-Command-Navigation.git
 Description: Add a voice command button widget for Elementor.
-Version: 1.2.1
+Version: 1.2.2
 Author: Your Name
 Author URI: https://yourwebsite.com
 License: GPL2
