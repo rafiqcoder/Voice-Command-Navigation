@@ -6,6 +6,8 @@ Description: Add a voice command button widget for Elementor.
 Version: 1.2.5
 Author: rafiqcoder
 Author URI: https://rafiqcoder.com
+GitHub Plugin URI: https://github.com/rafiqcoder/Voice-Command-Navigation
+GitHub Branch: main
 License: GPL2
 */
 
@@ -155,17 +157,17 @@ function register_voice_command_widget($widgets_manager) {
 add_action('elementor/widgets/register', 'register_voice_command_widget');
 
 
-if ( ! class_exists( 'Puc_v4_Factory' ) ) {
-    require_once plugin_dir_path( __FILE__ ) . 'plugin-update-checker/plugin-update-checker.php';
-}
+// if ( ! class_exists( 'Puc_v4_Factory' ) ) {
+//     require_once plugin_dir_path( __FILE__ ) . 'plugin-update-checker/plugin-update-checker.php';
+// }
 
-$updateChecker = Puc_v4_Factory::buildUpdateChecker(
-    'https://github.com/rafiqcoder/Voice-Command-Navigation/',
-    __FILE__,
-    'your-plugin-slug'
-);
+// $updateChecker = Puc_v4_Factory::buildUpdateChecker(
+//     'https://github.com/rafiqcoder/Voice-Command-Navigation/',
+//     __FILE__,
+//     'your-plugin-slug'
+// );
 
-// Optional: Set the branch (default is 'main' or 'master').
-$updateChecker->setBranch('main');
+// // Optional: Set the branch (default is 'main' or 'master').
+// $updateChecker->setBranch('main');
 
-$updateChecker->setAuthentication(getenv('accesstoken'));
+// $updateChecker->setAuthentication(getenv('accesstoken'));
