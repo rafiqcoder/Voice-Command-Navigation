@@ -1,13 +1,10 @@
 document.addEventListener('DOMContentLoaded',() => {
     const btn = document.getElementById('voice-command-btn');
+    const icon = document.getElementById('voice-command-icon');
+    const tooltip = btn.querySelector('.tooltip-text');
 
-    if (!btn) {
-        console.error('Voice command button not found in the DOM.');
-        return;
-    }
-    console.log(vcpLinks);
-    if (!Array.isArray(vcpLinks)) {
-        console.error('vcpLinks is not an array. Please check the backend implementation.');
+    if (!btn || !icon) {
+        console.error('Voice command button or icon not found in the DOM.');
         return;
     }
 
@@ -20,27 +17,18 @@ document.addEventListener('DOMContentLoaded',() => {
         const startRecognition = () => {
             recognition.start();
             console.log('Listening started...');
-            btn.textContent = 'Listening...';
-            btn.disabled = true;
-
-            setTimeout(() => {
-                recognition.stop();
-                console.log('Stopped listening after 10 seconds.');
-                btn.textContent = 'Start Voice Command';
-                btn.disabled = false;
-            },10000);
+            icon.style.color = 'red'; // Change icon color when listening
         };
 
-        startRecognition();
-
-        btn.addEventListener('click',() => {
-            recognition.stop();
-            btn.textContent = 'Stopped. Restarting...';
-            btn.disabled = true;
-
-            setTimeout(() => {
+        icon.addEventListener('click',(event) => {
+            event.stopPropagation(); // Prevent click event from bubbling
+            if (recognition.running) {
+                recognition.stop();
+                console.log('Stopped listening.');
+                icon.style.color = ''; // Reset icon color
+            } else {
                 startRecognition();
-            },500);
+            }
         });
 
         recognition.onresult = (event) => {
@@ -48,7 +36,6 @@ document.addEventListener('DOMContentLoaded',() => {
             console.log('Command received:',command);
 
             let found = false;
-
             vcpLinks.forEach(link => {
                 if (command.includes(link.command.toLowerCase())) {
                     window.location.href = link.url;
@@ -59,26 +46,30 @@ document.addEventListener('DOMContentLoaded',() => {
             if (!found) {
                 alert(`Unrecognized command: "${command}"`);
             }
-
-            btn.textContent = 'Start Voice Command';
-            btn.disabled = false;
         };
 
         recognition.onerror = (event) => {
             console.error('Recognition error:',event.error);
             alert('There was an error with voice recognition. Please try again.');
-            btn.textContent = 'Start Voice Command';
-            btn.disabled = false;
+            icon.style.color = ''; // Reset icon color
         };
 
         recognition.onend = () => {
             console.log('Voice recognition ended.');
-            btn.textContent = 'Start Voice Command';
-            btn.disabled = false;
+            icon.style.color = ''; // Reset icon color
         };
     } else {
         console.error('Speech recognition not supported.');
         btn.style.display = 'none';
         alert('Your browser does not support voice commands.');
     }
+
+    // Tooltip Hover Effect
+    btn.addEventListener('mouseover',() => {
+        tooltip.style.visibility = 'visible';
+    });
+
+    btn.addEventListener('mouseout',() => {
+        tooltip.style.visibility = 'hidden';
+    });
 });

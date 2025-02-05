@@ -1,3 +1,4 @@
+
 <?php
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
@@ -9,27 +10,22 @@ use Elementor\Icons_Manager;
 
 class Voice_Command_Widget extends \Elementor\Widget_Base {
 
-    // Widget name
     public function get_name() {
         return 'voice_command_widget';
     }
 
-    // Widget title
     public function get_title() {
         return __('Voice Command Button', 'voice-command-plugin');
     }
 
-    // Widget icon
     public function get_icon() {
         return 'eicon-microphone';
     }
 
-    // Widget category
     public function get_categories() {
         return ['general'];
     }
 
-    // Widget controls
     protected function _register_controls() {
         $this->start_controls_section(
             'content_section',
@@ -42,7 +38,7 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
         $this->add_control(
             'button_text',
             [
-                'label' => __('Button Text', 'voice-command-plugin'),
+                'label' => __('Tooltip Text', 'voice-command-plugin'),
                 'type' => Controls_Manager::TEXT,
                 'default' => __('Start Voice Command', 'voice-command-plugin'),
             ]
@@ -54,21 +50,15 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
                 'label' => __('Button Background Color', 'voice-command-plugin'),
                 'type' => Controls_Manager::COLOR,
                 'default' => '#0073aa',
-                'selectors' => [
-                    '{{WRAPPER}} #voice-command-btn' => 'background-color: {{VALUE}};',
-                ],
             ]
         );
 
         $this->add_control(
-            'text_color',
+            'icon_color',
             [
-                'label' => __('Text Color', 'voice-command-plugin'),
+                'label' => __('Icon Color', 'voice-command-plugin'),
                 'type' => Controls_Manager::COLOR,
                 'default' => '#ffffff',
-                'selectors' => [
-                    '{{WRAPPER}} #voice-command-btn' => 'color: {{VALUE}};',
-                ],
             ]
         );
 
@@ -86,41 +76,6 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
             ]
         );
 
-        $this->add_group_control(
-            \Elementor\Group_Control_Typography::get_type(),
-            [
-                'name' => 'button_typography',
-                'label' => __('Typography', 'voice-command-plugin'),
-                'selector' => '{{WRAPPER}} #voice-command-btn',
-            ]
-        );
-
-        $this->add_responsive_control(
-            'alignment',
-            [
-                'label' => __('Alignment', 'voice-command-plugin'),
-                'type' => Controls_Manager::CHOOSE,
-                'options' => [
-                    'left' => [
-                        'title' => __('Left', 'voice-command-plugin'),
-                        'icon' => 'eicon-text-align-left',
-                    ],
-                    'center' => [
-                        'title' => __('Center', 'voice-command-plugin'),
-                        'icon' => 'eicon-text-align-center',
-                    ],
-                    'right' => [
-                        'title' => __('Right', 'voice-command-plugin'),
-                        'icon' => 'eicon-text-align-right',
-                    ],
-                ],
-                'default' => 'center',
-                'selectors' => [
-                    '{{WRAPPER}}' => 'text-align: {{VALUE}};',
-                ],
-            ]
-        );
-
         $this->add_control(
             'button_icon',
             [
@@ -133,68 +88,131 @@ class Voice_Command_Widget extends \Elementor\Widget_Base {
             ]
         );
 
-        $this->add_control(
-            'icon_position',
-            [
-                'label' => __('Icon Position', 'voice-command-plugin'),
-                'type' => Controls_Manager::SELECT,
-                'options' => [
-                    'before' => __('Before Text', 'voice-command-plugin'),
-                    'after' => __('After Text', 'voice-command-plugin'),
-                ],
-                'default' => 'before',
-            ]
-        );
-
-        $this->add_control(
-            'custom_css',
-            [
-                'label' => __('Custom CSS', 'voice-command-plugin'),
-                'type' => Controls_Manager::TEXTAREA,
-                'description' => __('Add custom CSS styles for this button.', 'voice-command-plugin'),
-            ]
-        );
-
         $this->end_controls_section();
     }
 
-protected function render() {
-    $settings = $this->get_settings_for_display();
+    protected function render() {
+        $settings = $this->get_settings_for_display();
+        $size_class = $settings['button_size'];
+        ?>
 
-    // Render the icon HTML
-    $icon_html = '';
-    if (!empty($settings['button_icon']['value'])) {
-        $icon_html = \Elementor\Icons_Manager::render_icon($settings['button_icon'], ['aria-hidden' => 'true']);
+        <div style="display: flex; justify-content: center;">
+            <button id="voice-command-btn" class="<?php echo esc_attr($size_class); ?>" style="
+                background-color: <?php echo esc_attr($settings['button_color']); ?>;
+                border: none;
+                border-radius: 50%;
+                width: <?php echo ($size_class === 'large' ? '60px' : ($size_class === 'small' ? '40px' : '50px')); ?>;
+                height: <?php echo ($size_class === 'large' ? '60px' : ($size_class === 'small' ? '40px' : '50px')); ?>;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            ">
+
+                <span class="tooltip-text" style="
+                    visibility: hidden;
+                    background-color: black;
+                    color: white;
+                    text-align: center;
+                    border-radius: 5px;
+                    padding: 5px;
+                    position: absolute;
+                    bottom: 120%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    white-space: nowrap;
+                    font-size: 12px;
+                ">
+                    <?php echo esc_html($settings['button_text']); ?>
+                </span>
+
+                <i id="voice-command-icon" class="<?php echo esc_attr($settings['button_icon']['value']); ?>" style="
+                    font-size: <?php echo ($size_class === 'large' ? '24px' : ($size_class === 'small' ? '16px' : '20px')); ?>;
+                    color: <?php echo esc_attr($settings['icon_color']); ?>;
+                "></i>
+
+            </button>
+        </div>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('voice-command-btn');
+            const icon = document.getElementById('voice-command-icon');
+            const tooltip = btn.querySelector('.tooltip-text');
+
+            if (!btn || !icon) {
+                console.error('Voice command button or icon not found in the DOM.');
+                return;
+            }
+
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.lang = 'en-US';
+                recognition.continuous = true;
+                recognition.interimResults = false;
+
+                const startRecognition = () => {
+                    recognition.start();
+                    console.log('Listening started...');
+                    icon.style.color = 'red';
+                };
+
+                icon.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    if (recognition.running) {
+                        recognition.stop();
+                        console.log('Stopped listening.');
+                        icon.style.color = '<?php echo esc_attr($settings['icon_color']); ?>';
+                    } else {
+                        startRecognition();
+                    }
+                });
+
+                recognition.onresult = (event) => {
+                    const command = event.results[0][0].transcript.toLowerCase();
+                    console.log('Command received:', command);
+
+                    let found = false;
+                    vcpLinks.forEach(link => {
+                        if (command.includes(link.command.toLowerCase())) {
+                            window.location.href = link.url;
+                            found = true;
+                        }
+                    });
+
+                    if (!found) {
+                        alert(`Unrecognized command: "${command}"`);
+                    }
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Recognition error:', event.error);
+                    alert('There was an error with voice recognition. Please try again.');
+                    icon.style.color = '<?php echo esc_attr($settings['icon_color']); ?>';
+                };
+
+                recognition.onend = () => {
+                    console.log('Voice recognition ended.');
+                    icon.style.color = '<?php echo esc_attr($settings['icon_color']); ?>';
+                };
+            } else {
+                console.error('Speech recognition not supported.');
+                btn.style.display = 'none';
+                alert('Your browser does not support voice commands.');
+            }
+
+            // Tooltip Hover Effect
+            btn.addEventListener('mouseover', () => {
+                tooltip.style.visibility = 'visible';
+            });
+
+            btn.addEventListener('mouseout', () => {
+                tooltip.style.visibility = 'hidden';
+            });
+        });
+        </script>
+
+        <?php
     }
-
-    // Determine the button size class
-    $size_class = $settings['button_size'];
-
-    // Add custom CSS if provided
-    if (!empty($settings['custom_css'])) {
-        echo '<style>' . $settings['custom_css'] . '</style>';
-    }
-
-    ?>
-    <div style="text-align: <?php echo esc_attr($settings['alignment']); ?>;">
-        <button id="voice-command-btn" class="<?php echo esc_attr($size_class); ?>" style="
-            background-color: <?php echo esc_attr($settings['button_color']); ?>;
-            color: <?php echo esc_attr($settings['text_color']); ?>;
-            padding: <?php echo ($size_class === 'large' ? '15px 20px' : ($size_class === 'small' ? '5px 10px' : '10px 15px')); ?>;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        " >
-            <?php if ($settings['icon_position'] === 'before') echo $icon_html; ?>
-            <span><?php echo esc_html($settings['button_text']); ?></span>
-            <?php if ($settings['icon_position'] === 'after') echo $icon_html; ?>
-        </button>
-    </div>
-    
-    <?php
 }
-
