@@ -3,12 +3,10 @@
 Plugin Name: Voice Command Plugin
 Plugin URI: https://github.com/rafiqcoder/Voice-Command-Navigation.git
 Description: Add a voice command button widget for Elementor.
-Version: 1.2.2
-Author: Your Name
-Author URI: https://yourwebsite.com
+Version: 1.2.4
+Author: rafiqcoder
+Author URI: https://rafiqcoder.com
 License: GPL2
-GitHub Plugin URI: https://github.com/rafiqcoder/Voice-Command-Navigation.git
-GitHub Branch: main
 */
 
 
@@ -16,7 +14,7 @@ GitHub Branch: main
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
 }
-define('VOICE_COMMAND_PLUGIN_VERSION', '1.2');
+define('VOICE_COMMAND_PLUGIN_VERSION', '1.2.4');
 
 // Add a menu item in the WordPress admin
 function vcp_add_admin_menu() {
@@ -157,38 +155,17 @@ function register_voice_command_widget($widgets_manager) {
 add_action('elementor/widgets/register', 'register_voice_command_widget');
 
 
-function vcp_check_for_github_updates($transient) {
-    if (empty($transient->checked)) {
-        return $transient;
-    }
-
-    $plugin_slug = 'voice-command-plugin';
-    $github_api_url = 'https://github.com/rafiqcoder/Voice-Command-Navigation/releases/latest';
-
-    $response = wp_remote_get($github_api_url);
-
-    if (is_wp_error($response)) {
-        return $transient;
-    }
-
-    $release_info = json_decode(wp_remote_retrieve_body($response), true);
-    if (!isset($release_info['tag_name'])) {
-        return $transient;
-    }
-
-    $latest_version = ltrim($release_info['tag_name'], 'v');
-    $current_version = VOICE_COMMAND_PLUGIN_VERSION;
-
-    if (version_compare($current_version, $latest_version, '<')) {
-        $transient->response["{$plugin_slug}/{$plugin_slug}.php"] = (object) [
-            'slug'        => $plugin_slug,
-            'plugin'      => "{$plugin_slug}/{$plugin_slug}.php",
-            'new_version' => $latest_version,
-            'url'         => $release_info['html_url'],
-            'package'     => $release_info['assets'][0]['browser_download_url'],
-        ];
-    }
-
-    return $transient;
+if ( ! class_exists( 'Puc_v4_Factory' ) ) {
+    require_once plugin_dir_path( __FILE__ ) . 'plugin-update-checker/plugin-update-checker.php';
 }
-add_filter('site_transient_update_plugins', 'vcp_check_for_github_updates');
+
+$updateChecker = Puc_v4_Factory::buildUpdateChecker(
+    'https://github.com/rafiqcoder/Voice-Command-Navigation/',
+    __FILE__,
+    'your-plugin-slug'
+);
+
+// Optional: Set the branch (default is 'main' or 'master').
+$updateChecker->setBranch('main');
+
+$updateChecker->setAuthentication(getenv('accesstoken'));
